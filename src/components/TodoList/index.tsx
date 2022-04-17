@@ -4,29 +4,46 @@ import TdInput from './Input'
 import { ITodo,IState, ACTION_TYPE } from './typings'
 import { todoReducer } from './reducer'
 const TodoList = () => { 
-    // const [todoList, setTodoList] = useState<ITodo[]>([])
     const initialState:IState = {
         todoList:[]
     }
     const [state,dispatch] = useReducer(todoReducer,initialState)
     const addTodo = (todo: ITodo) => {
-        // setTodoList(todoList => [...todoList,todo])
-        // console.log(todo)
         dispatch({
             type: ACTION_TYPE.ADD_TODO,
             payload: todo
         })
     }
+    const removeTodo = (id:number) => {
+        dispatch({
+            type: ACTION_TYPE.REMOVE_TODO,
+            payload: id
+        })
+    }
+    const toggleTodo = (id: number) => {
+        dispatch({
+            type: ACTION_TYPE.TOGGLE_TODO,
+            payload: id
+        })
+    }
     useEffect(() => { 
-        console.log(state.todoList,'todoList')
-    })
+       
+        const todoList = JSON.parse(localStorage.getItem('todoList') || '[]')
+        dispatch({
+            type: ACTION_TYPE.INIT_TODOLIST,
+            payload: todoList
+        })
+    },[])
+    useEffect(() => { 
+        localStorage.setItem('todoList', JSON.stringify(state.todoList))
+    },[state.todoList])
     return (
         <div className='todo-list'>
             <TdInput
                 addTodo={ addTodo }
                 todoList={ state.todoList }
             ></TdInput>
-            <TdList></TdList>
+            <TdList todoList={state.todoList} removeTodo={ removeTodo } toggleTodo = { toggleTodo }></TdList>
         </div>
     )
 }
